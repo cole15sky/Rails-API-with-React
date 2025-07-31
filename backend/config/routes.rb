@@ -1,22 +1,18 @@
 Rails.application.routes.draw do
-  devise_for :users
-
   root to: "home#index"
+
+  devise_for :users,
+             path: 'api/auth',
+             controllers: {
+               sessions: 'users/sessions'
+             },
+             defaults: { format: :json }
 
   namespace :api do
     resources :blogs do
       member do
         patch 'update_completed'
       end
-    end
-
-    devise_for :users, skip: [:sessions], controllers: {
-      sessions: 'api/sessions'
-    }
-
-    as :user do
-      post 'login', to: 'api/sessions#create'
-      delete 'logout', to: 'api/sessions#destroy'
     end
   end
 end
