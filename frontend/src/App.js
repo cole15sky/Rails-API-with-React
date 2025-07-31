@@ -1,12 +1,11 @@
-import logo from './logo.svg';
+import React from "react";
 import './App.css';
+import Sidebar from './components/Sidebar';
 
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
-    <h1> React-Rails App</h1>
-      </header>
+      <Sidebar />
     </div>
   );
 }
