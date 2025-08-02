@@ -1,5 +1,5 @@
 class Blog < ApplicationRecord
-    validatables :title, :content, presence: true
-    validatables :description, presence: true
-    belongs_to :user
+  validates :title, presence: true
+  validates :description, presence: true
+  belongs_to :user
 end
