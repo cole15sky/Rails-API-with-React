@@ -1,51 +1,50 @@
 class Api::BlogsController < ApplicationController
-  before_action :set_blog, only: %i[ show update destroy ]
+  before_action :authenticate_user!, only: %i[create update destroy]
+  before_action :set_blog, only: %i[show update destroy]
 
-  # GET /blogs
   def index
     @blogs = Blog.all
-
     render json: @blogs
   end
 
-  # GET /blogs/1
   def show
     render json: @blog
   end
 
-  # POST /blogs
   def create
-    @blog = Blog.new(blog_params)
+    @blog = current_user.blogs.build(blog_params)
 
     if @blog.save
-      render json: @blog, status: :created, location: @blog
+      render json: @blog, status: :created, location: api_blog_url(@blog)
     else
       render json: @blog.errors, status: :unprocessable_entity
     end
   end
 
-  # PATCH/PUT /blogs/1
   def update
-    if @blog.update(blog_params)
+    if @blog.user == current_user && @blog.update(blog_params)
       render json: @blog
     else
-      render json: @blog.errors, status: :unprocessable_entity
+      render json: { error: "Unauthorized or invalid data" }, status: :unprocessable_entity
     end
   end
 
-  # DELETE /blogs/1
   def destroy
-    @blog.destroy!
+    if @blog.user == current_user
+      @blog.destroy!
+      head :no_content
+    else
+      render json: { error: "Unauthorized" }, status: :forbidden
+    end
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_blog
-      @blog = Blog.find(params.expect(:id))
-    end
 
-    # Only allow a list of trusted parameters through.
-    def blog_params
-      params.expect(blog: [ :title, :description ])
-    end
+  def set_blog
+    @blog = Blog.find(params[:id])
+  end
+
+  def blog_params
+    params.require(:blog).permit(:title, :description)
+  end
 end
