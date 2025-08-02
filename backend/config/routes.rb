@@ -1,17 +1,19 @@
 Rails.application.routes.draw do
   root to: "home#index"
 
-  devise_for :users,
-             path: 'api/auth',
-             controllers: {
-               sessions: 'users/sessions'
-             },
-             defaults: { format: :json }
-
+  devise_for :users, path: "", path_names: {
+    sign_in: "login",
+    sign_out: "logout",
+    registration: "signup"
+  },
+  controllers: {
+    sessions: "users/sessions",
+    registrations: "users/registrations"
+  }
   namespace :api do
     resources :blogs do
       member do
-        patch 'update_completed'
+        patch "update_completed"
       end
     end
   end
