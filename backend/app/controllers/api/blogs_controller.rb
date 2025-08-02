@@ -1,6 +1,7 @@
 class Api::BlogsController < ApplicationController
   before_action :authenticate_user!, only: %i[create update destroy]
   before_action :set_blog, only: %i[show update destroy]
+  before_action :authorize_admin!, only: %i[create update destroy]
 
   def index
     @blogs = Blog.all
@@ -39,6 +40,9 @@ class Api::BlogsController < ApplicationController
   end
 
   private
+  def authorize_admin!
+       render json: {message: "Forbidden action."} unless current_user.email == 'thesky@gmail.com'
+    end
 
   def set_blog
     @blog = Blog.find(params[:id])
