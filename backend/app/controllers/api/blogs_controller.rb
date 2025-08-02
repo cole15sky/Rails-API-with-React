@@ -41,7 +41,7 @@ class Api::BlogsController < ApplicationController
 
   private
   def authorize_admin!
-       render json: {message: "Forbidden action."} unless current_user.email == 'thesky@gmail.com'
+       render json: {message: "Forbidden action."} unless current_user.email == ENV['ADMIN_EMAIL']
     end
 
   def set_blog

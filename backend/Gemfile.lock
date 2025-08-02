@@ -369,6 +369,7 @@ DEPENDENCIES
   debug
   devise
   devise-jwt
+  dotenv
   jsonapi-serializer
   kamal
   puma (>= 5.0)
