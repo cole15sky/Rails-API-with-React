@@ -12,8 +12,8 @@ function App() {
       <Sidebar />
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+        <Route path="/login" element={<Authentication/>} />
+        <Route path="/register" element={<Authentication/>} />
       </Routes>
     </BrowserRouter>
   );
