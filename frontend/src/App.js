@@ -1,14 +1,20 @@
 import React from "react";
-import './App.css';
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+
 import Sidebar from './components/Sidebar';
 import Home from './pages/Home';
+import Authentication, { PageType } from './pages/Authentication';
 
 function App() {
   return (
-    <div className="App">
+    <BrowserRouter>
       <Sidebar />
-      <Home />
-    </div>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Authentication pageType={PageType.LOGIN} />} />
+        <Route path="/register" element={<Authentication pageType={PageType.REGISTER} />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
