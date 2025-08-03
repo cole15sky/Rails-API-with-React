@@ -3,8 +3,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import Sidebar from './components/Sidebar';
 import Home from './pages/Home';
-import Login from './pages/Login';
-import Register from './pages/Register';
+import Authentication, { PageType } from './pages/Authentication';
 
 function App() {
   return (
@@ -12,8 +11,8 @@ function App() {
       <Sidebar />
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Authentication/>} />
-        <Route path="/register" element={<Authentication/>} />
+        <Route path="/login" element={<Authentication pageType={PageType.LOGIN} />} />
+        <Route path="/register" element={<Authentication pageType={PageType.REGISTER} />} />
       </Routes>
     </BrowserRouter>
   );
