@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import { validateEmail, validatePassword } from "../utilities/validations";
-import { Link } from "react-router-dom"; // ✅ Capital 'L'
+import { Link, useNavigate } from "react-router-dom";
+import { registerApi, loginApi } from "../apis/authentication";
 
 export const PageType = Object.freeze({
   LOGIN: 0,
@@ -15,40 +16,80 @@ const initialErrorState = {
 };
 
 const Authentication = ({ pageType }) => {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState(initialErrorState);
 
-  const handleEmailChange = (e) => {
-    setEmail(e.target.value);
-    setErrors((prev) => ({ ...prev, email: "" }));
-  };
+  // Redirect away if already logged in
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      navigate("/");
+    }
+  }, [navigate]);
 
-  const handlePasswordChange = (e) => {
-    setPassword(e.target.value);
-    setErrors((prev) => ({ ...prev, password: "" }));
-  };
+  const handleEmailChange = (e) => setEmail(e.target.value);
+  const handlePasswordChange = (e) => setPassword(e.target.value);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const newErrors = { ...initialErrorState };
+
+    let newErrors = {};
 
     if (!validateEmail(email)) {
       newErrors.email = "Please enter a valid email address.";
     }
 
     if (!validatePassword(password)) {
-      newErrors.password = "Password should be at least 6 characters long.";
+      newErrors.password = "Password must be at least 6 characters long.";
     }
 
     setErrors(newErrors);
 
-    if (newErrors.email || newErrors.password) {
-      return;
-    }
+    const hasErrors = Object.values(newErrors).some((error) => error !== "");
+    if (hasErrors) return;
 
-    console.log("email:", email);
-    console.log("password:", password);
+    if (pageType === PageType.LOGIN) {
+      try {
+        const { result, error } = await loginApi({ user: { email, password } });
+
+        if (error) {
+          setErrors((prev) => ({ ...prev, api: error }));
+          return;
+        }
+
+        console.log("Login success:", result);
+
+        localStorage.setItem("user", JSON.stringify(result.data));
+
+        navigate("/");
+      } catch (err) {
+        console.error("Unexpected error:", err);
+        setErrors((prev) => ({
+          ...prev,
+          api: "Something went wrong. Please try again.",
+        }));
+      }
+    } else {
+      try {
+        const { result, error } = await registerApi({ user: { email, password } });
+
+        if (error) {
+          setErrors((prev) => ({ ...prev, api: error }));
+          return;
+        }
+
+        console.log("Registration success:", result);
+        navigate("/login");
+      } catch (err) {
+        console.error("Unexpected error:", err);
+        setErrors((prev) => ({
+          ...prev,
+          api: "Something went wrong. Please try again.",
+        }));
+      }
+    }
   };
 
   return (
@@ -58,23 +99,21 @@ const Authentication = ({ pageType }) => {
           {pageType === PageType.LOGIN ? "Login" : "Register"}
         </h3>
 
-        <p className="mt-4 text-center text-sm">
-          {pageType === PageType.LOGIN ? (
-            <>
-              Not a user?{" "}
-              <Link to="/register" className="text-indigo-600 underline hover:text-indigo-800">
-                Register
-              </Link>
-            </>
-          ) : (
-            <>
-              Already a user?{" "}
-              <Link to="/login" className="text-indigo-600 underline hover:text-indigo-800">
-                Login
-              </Link>
-            </>
-          )}
-        </p>
+        {pageType === PageType.LOGIN ? (
+          <p className="mt-4 text-center text-sm">
+            Not a user?{" "}
+            <Link to="/register" className="text-indigo-600 underline hover:text-indigo-800">
+              Register
+            </Link>
+          </p>
+        ) : (
+          <p>
+            Already a user?{" "}
+            <Link to="/login" className="text-indigo-600 underline hover:text-indigo-800">
+              Login
+            </Link>
+          </p>
+        )}
 
         <form onSubmit={handleSubmit} className="flex mt-10 flex-col gap-6">
           <div className="flex flex-col gap-2">
@@ -87,9 +126,7 @@ const Authentication = ({ pageType }) => {
               onChange={handleEmailChange}
               required
             />
-            {errors.email && (
-              <p className="text-sm text-red-500">{errors.email}</p>
-            )}
+            {errors.email && <p className="text-sm text-red-500">{errors.email}</p>}
           </div>
 
           <div className="flex flex-col gap-2">
@@ -102,10 +139,12 @@ const Authentication = ({ pageType }) => {
               onChange={handlePasswordChange}
               required
             />
-            {errors.password && (
-              <p className="text-sm text-red-500">{errors.password}</p>
-            )}
+            {errors.password && <p className="text-sm text-red-500">{errors.password}</p>}
           </div>
+
+          {errors.api && (
+            <p className="text-sm text-red-500 text-center">{errors.api}</p>
+          )}
 
           <button
             type="submit"
