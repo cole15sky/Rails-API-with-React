@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
-
+import { validateEmail, validatePassword } from "../utilities/validations";
 export const PageType = Object.freeze({
   LOGIN: 0,
   REGISTER: 1,
@@ -16,10 +16,19 @@ const Authentication = ({ pageType }) => {
   const handlePasswordChange = (e) => {
     setPassword(e.target.value);
   };
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log("email: ", email);
     console.log("password: ", password);
+    if (!validateEmail(email)) {
+      alert("Please enter a valid email address.");
+      return;
+    }
+    if (!validatePassword(password)) {
+      alert("Password must be at least 6 characters long.");
+      return;
+    }
   };
 
   return (
