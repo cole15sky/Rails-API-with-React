@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { validateEmail, validatePassword } from "../utilities/validations";
+import { Link } from "react-router-dom"; // ✅ Capital 'L'
 
 export const PageType = Object.freeze({
   LOGIN: 0,
@@ -56,6 +57,24 @@ const Authentication = ({ pageType }) => {
         <h3 className="text-3xl font-bold text-center mb-8">
           {pageType === PageType.LOGIN ? "Login" : "Register"}
         </h3>
+
+        <p className="mt-4 text-center text-sm">
+          {pageType === PageType.LOGIN ? (
+            <>
+              Not a user?{" "}
+              <Link to="/register" className="text-indigo-600 underline hover:text-indigo-800">
+                Register
+              </Link>
+            </>
+          ) : (
+            <>
+              Already a user?{" "}
+              <Link to="/login" className="text-indigo-600 underline hover:text-indigo-800">
+                Login
+              </Link>
+            </>
+          )}
+        </p>
 
         <form onSubmit={handleSubmit} className="flex mt-10 flex-col gap-6">
           <div className="flex flex-col gap-2">
