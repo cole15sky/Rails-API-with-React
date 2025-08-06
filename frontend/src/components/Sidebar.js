@@ -36,6 +36,7 @@ const Sidebar = () => {
   const navItems = user
     ? [
         ...baseNavItems,
+        { icon: "📊", label: "Dashboard", to: "/dashboard" },
         { icon: "🚪", label: "Logout", to: "" },
       ]
     : baseNavItems;
